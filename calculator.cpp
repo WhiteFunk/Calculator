@@ -5,6 +5,8 @@
 #include <QLineEdit>
 #include <QtMath>
 
+#include <QDebug>
+
 #include <stack>
 
 
@@ -49,10 +51,10 @@ void Calculator::create_buttons()
     Button *clearButton = createButton(tr("Clear"), SLOT(clear()));
     Button *equalButton = createButton(tr("="), SLOT(equalClicked()));
 
-    Button *sinButton = createButton(tr("sin"), SLOT(sinClicked()));
-    Button *cosButton = createButton(tr("cos"), SLOT(cosClicked()));
-    Button *tnButton = createButton(tr("tn"), SLOT(tnClicked()));
-    Button *ctgButton = createButton(tr("ctg"), SLOT(ctgClicked()));
+    Button *sinButton = createButton(tr("sin"), SLOT(trigFunctionClicked()));
+    Button *cosButton = createButton(tr("cos"), SLOT(trigFunctionClicked()));
+    Button *tnButton = createButton(tr("tn"), SLOT(trigFunctionClicked()));
+    Button *ctgButton = createButton(tr("ctg"), SLOT(trigFunctionClicked()));
 
     Button *divisionButton = createButton(tr("\303\267"), SLOT(divisionButtonClicked()));
     Button *timesButton = createButton(tr("\303\227"), SLOT(timesButtonClicked()));
@@ -61,7 +63,7 @@ void Calculator::create_buttons()
 
     Button *squareRootButton = createButton(tr("√"), SLOT(unaryOperatorClicked()));
     Button *powerButton = createButton(tr("x\302\262"), SLOT(unaryOperatorClicked()));
-    Button *factorialButton = createButton(tr("x!"), SLOT(factorialClicked()));
+    Button *factorialButton = createButton(tr("x!"), SLOT(unaryOperatorClicked()));
 
     //Add buttons to layout
 
@@ -94,12 +96,80 @@ void Calculator::create_buttons()
     mainLayout->addWidget(minusButton, 4, 5);
     mainLayout->addWidget(plusButton, 5, 5);
 
-
-
-
     setLayout(mainLayout);
+
+    setWidgetStyle();
 }
 
+template <typename T>
+T factorial(T n){
+    return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
+}
+
+
+void Calculator::unaryOperatorClicked(){
+
+        Button *clickedButton = qobject_cast<Button *>(sender());
+        QString clickedOperator = clickedButton->text();
+        double operand = (QString::number(evaluate((display->text()).toStdString()))).toDouble();
+        double result = 0.0;
+
+        display->setText(QString::number(evaluate((display->text()).toStdString())));
+
+        if (clickedOperator == tr("√"))
+        {
+            if (operand < 0.0) {
+                return;
+            }
+            result = std::sqrt(operand);
+        }
+        if (clickedOperator == tr("x\302\262"))
+        {
+            result = std::pow(operand, 2.0);
+        }
+        if (clickedOperator == tr("x!"))
+        {
+            if (operand == 0.0) {
+                return;
+            }
+            result = factorial(operand);
+        }
+        display->setText(QString::number(result));
+}
+
+void Calculator::trigFunctionClicked()
+{
+    Button *clickedButton = qobject_cast<Button *>(sender());
+    QString clickedOperator = clickedButton->text();
+    double operand = (QString::number(evaluate((display->text()).toStdString()))).toDouble();
+    double result = 0.0;
+
+    double pi = 3.1415926535;
+
+    display->setText(QString::number(evaluate((display->text()).toStdString())));
+
+    if (clickedOperator == tr("sin"))
+    {
+        result = std::sin(operand* (pi/180));
+    }
+
+    if (clickedOperator == tr("cos"))
+    {
+        result = std::cos(operand* (pi/180));
+    }
+
+    if (clickedOperator == tr("tn"))
+    {
+        result = std::tan(operand* (pi/180));
+    }
+
+    if (clickedOperator == tr("ctg"))
+    {
+        result = 1/std::tan(operand* (pi/180));
+    }
+
+    display->setText(QString::number(result));
+}
 
 
 bool Calculator::isDigit(char c)
@@ -300,6 +370,35 @@ Button *Calculator::createButton(const QString &text, const char *member)
 }
 
 
+
+void Calculator::setWidgetStyle()
+{
+    this->setStyleSheet(
+    "QWidget{"
+        "background-color:#8c8c8c;"
+    "}"
+    "QLineEdit{"
+        "border:1px solid #aaa;"
+        "background:#d9d9d9;"
+        "border-radius:3px;"
+        "color:#1a1a1a;"
+    "}"
+    "QLineEdit:hover{"
+        "border:1px solid #0078d7;"
+    "}"
+    "QToolButton{"
+        "background-color: qlineargradient(spread:pad, x1:0.585, y1:1, x2:0.506, y2:0, stop:0 rgba(150, 150, 150, 255), stop:1 rgba(202, 202, 202, 255));"
+        "border-radius:7px;"
+        "border:1px solid #aaa;"
+        "color:#1a1a1a;"
+    "}"
+    "QToolButton:hover{"
+        "background-color: qlineargradient(spread:pad, x1:0.585, y1:1, x2:0.506, y2:0, stop:0 rgba(200, 200, 200, 200), stop:1 rgba(232, 232, 232, 255));"
+        "border-radius:7px;"
+        "border:1px solid #0078d7;"
+        "color:#111;"
+    "}");
+}
 
 
 

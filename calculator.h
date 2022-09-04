@@ -32,6 +32,9 @@ private slots:
     void minusClicked();
     void plusClicked();
 
+    void unaryOperatorClicked();
+    void trigFunctionClicked();
+
 private:
     Button *createButton(const QString &text, const char *member);
 
@@ -43,6 +46,7 @@ private:
     int operate (int val1, int val2, char op);
     int evaluate (std::string s);
 
+    void setWidgetStyle();
 
     QLineEdit *display;
 
